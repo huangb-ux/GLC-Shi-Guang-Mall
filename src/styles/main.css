@@ -3022,4 +3022,185 @@ ul, ol { padding: 0; list-style: none; }
   .checkout-success { margin: 24px auto; padding: 32px 20px; }
 }
 
+/* ============================================================
+   桂林学院校园风景滚动卡片
+   ============================================================ */
+
+.campus-section { padding: 54px 0 18px; }
+.campus-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 28px;
+  margin-bottom: 24px;
+}
+.campus-title {
+  font-family: var(--font-serif);
+  font-size: 36px;
+  line-height: 1.28;
+  letter-spacing: -.01em;
+  margin: 8px 0 8px;
+}
+.campus-desc {
+  max-width: 540px;
+  font-size: 13px;
+  line-height: 1.9;
+  color: var(--muted);
+}
+.campus-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(20, 80, 60, .3);
+  color: var(--green);
+  font-size: 12.5px;
+  font-weight: 600;
+  transition: gap .2s;
+}
+.campus-source:hover { gap: 10px; }
+.campus-source .icon { width: 14px; height: 14px; }
+
+.campus-marquee {
+  position: relative;
+  overflow: hidden;
+  padding: 16px 0;
+  border-radius: 28px;
+  background: linear-gradient(115deg, #123d2f, #0d2e24);
+  box-shadow: var(--shadow-md);
+}
+.campus-marquee::before,
+.campus-marquee::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 3;
+  width: 70px;
+  pointer-events: none;
+}
+.campus-marquee::before { display: none; }
+.campus-marquee::after {
+  right: 0;
+  background: linear-gradient(270deg, #0d2e24, rgba(13, 46, 36, 0));
+}
+.campus-track {
+  display: flex;
+  width: max-content;
+  animation: campusScroll 58s linear infinite;
+  will-change: transform;
+}
+.campus-marquee:hover .campus-track { animation-play-state: paused; }
+
+.campus-scene {
+  position: relative;
+  flex: 0 0 380px;
+  height: 268px;
+  margin-right: 16px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #173f32;
+}
+.campus-scene img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .65s var(--ease);
+}
+.campus-scene:hover img { transform: scale(1.045); }
+.campus-scene-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(9, 26, 20, .24) 0%, rgba(9, 26, 20, .02) 38%, rgba(9, 26, 20, .72) 100%);
+}
+.campus-scene-tag,
+.campus-scene-index {
+  position: absolute;
+  top: 14px;
+  z-index: 2;
+  font-size: 9.5px;
+  letter-spacing: .04em;
+  color: var(--cream);
+}
+.campus-scene-tag {
+  left: 14px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(251, 247, 237, .28);
+  background: rgba(13, 46, 36, .58);
+  backdrop-filter: blur(6px);
+}
+.campus-scene-index {
+  right: 14px;
+  opacity: .7;
+  font-variant-numeric: tabular-nums;
+}
+.campus-scene-copy {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 16px;
+  z-index: 2;
+  color: var(--cream);
+}
+.campus-scene-copy h3 {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  line-height: 1.25;
+  margin-bottom: 4px;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, .24);
+}
+.campus-scene-copy p {
+  font-size: 10.5px;
+  line-height: 1.7;
+  color: rgba(251, 247, 237, .72);
+}
+.campus-credit {
+  text-align: right;
+  margin-top: 9px;
+  font-size: 9.5px;
+  letter-spacing: .03em;
+  color: var(--muted);
+  opacity: .7;
+}
+@keyframes campusScroll {
+  to { transform: translateX(-50%); }
+}
+
+@media (max-width: 900px) {
+  .campus-section { padding-top: 40px; }
+  .campus-title { font-size: 29px; }
+  .campus-head { gap: 16px; }
+  .campus-scene { flex-basis: 300px; height: 220px; }
+}
+
+@media (max-width: 640px) {
+  .campus-section { padding: 36px 0 8px; }
+  .campus-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .campus-title { font-size: 25px; }
+  .campus-desc { font-size: 12px; }
+  .campus-source { font-size: 11px; }
+  .campus-marquee { padding: 10px 0; border-radius: 20px; }
+  .campus-scene { flex-basis: 252px; height: 190px; margin-right: 10px; border-radius: 14px; }
+  .campus-scene-tag { top: 10px; left: 10px; font-size: 8.5px; padding: 3px 7px; }
+  .campus-scene-index { top: 10px; right: 10px; font-size: 8.5px; }
+  .campus-scene-copy { left: 13px; right: 13px; bottom: 12px; }
+  .campus-scene-copy h3 { font-size: 19px; }
+  .campus-scene-copy p { font-size: 9.5px; }
+  .campus-credit { font-size: 8.5px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .campus-track { animation: none; }
+  .campus-marquee { overflow-x: auto; }
+}
+
+
 

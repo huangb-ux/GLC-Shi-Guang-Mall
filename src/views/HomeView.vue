@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import Artwork from '../components/Artwork.vue';
 import CategoryIcon from '../components/CategoryIcon.vue';
+import CampusScenery from '../components/CampusScenery.vue';
 import Icon from '../components/Icon.vue';
 import ItemCard from '../components/ItemCard.vue';
 import {
@@ -147,6 +148,8 @@ function goSearch() {
         </RouterLink>
       </div>
     </section>
+
+    <CampusScenery />
 
     <section class="section wrap">
       <div class="section-head">
