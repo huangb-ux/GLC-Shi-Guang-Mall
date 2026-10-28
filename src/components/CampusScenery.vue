@@ -29,7 +29,6 @@ const loopScenes = [...CAMPUS_SCENES, ...CAMPUS_SCENES];
           <img
             :src="scene.src"
             :alt="`桂林学院 · ${scene.title}`"
-            loading="lazy"
             decoding="async"
             draggable="false"
           >
