@@ -89,6 +89,8 @@ onBeforeUnmount(() => {
 });
 
 const isHome = computed(() => route.name === 'home');
+const isForum = computed(() => route.name === 'forum');
+const isGames = computed(() => route.name === 'games');
 const isMessages = computed(() => route.name === 'messages');
 const isMe = computed(() => route.name === 'me' || route.name === 'favorites');
 </script>
@@ -111,7 +113,9 @@ const isMe = computed(() => route.name === 'me' || route.name === 'favorites');
       <span class="school-pill">{{ SCHOOL.name }}</span>
 
       <nav class="main-nav" aria-label="主导航">
-        <RouterLink to="/" class="nav-link" :class="{ 'is-active': isHome }">逛集市</RouterLink>
+        <RouterLink to="/" class="nav-link" :class="{ 'is-active': isHome }">集市</RouterLink>
+        <RouterLink to="/forum" class="nav-link" :class="{ 'is-active': isForum }">论坛</RouterLink>
+        <RouterLink to="/games" class="nav-link" :class="{ 'is-active': isGames }">游戏</RouterLink>
         <RouterLink to="/messages" class="nav-link" :class="{ 'is-active': isMessages }">
           消息
           <span v-if="unreadTotal" class="nav-dot"></span>

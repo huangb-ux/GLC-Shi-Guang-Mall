@@ -65,7 +65,9 @@ export const market = reactive({
   orders: [],
   reports: [],
   feedback: [],
-  flags: {}
+  flags: {},
+  forumPosts: [],
+  gamePosts: []
 });
 
 export const allListings = computed(() => market.listings);
@@ -120,13 +122,15 @@ async function setCurrentUser(account) {
 }
 
 export async function hydrateStore() {
-  const [accounts, listings, orders, reports, feedback, flags] = await Promise.all([
+  const [accounts, listings, orders, reports, feedback, flags, forumPosts, gamePosts] = await Promise.all([
     getAll('accounts'),
     getAll('listings'),
     getAll('orders'),
     getAll('reports'),
     getAll('feedback'),
-    getAll('sellerFlags')
+    getAll('sellerFlags'),
+    getAll('forumPosts'),
+    getAll('gamePosts')
   ]);
 
   market.accounts = accounts;
@@ -135,6 +139,8 @@ export async function hydrateStore() {
   market.reports = reports;
   market.feedback = feedback;
   market.flags = Object.fromEntries(flags.map(flag => [flag.sellerId, flag]));
+  market.forumPosts = forumPosts.sort((a, b) => b.createdAt - a.createdAt);
+  market.gamePosts = gamePosts.sort((a, b) => b.createdAt - a.createdAt);
 
   const sessionId = localStorage.getItem(SESSION_KEY);
   const sessionUser = accounts.find(account => account.id === sessionId);
@@ -574,4 +580,91 @@ export function getFilteredListings(params = {}) {
   else result.sort((a, b) => b.createdAt - a.createdAt);
 
   return result;
+}
+
+export async function createForumPost({ title, topic, content }) {
+  if (!market.currentUser) throw new Error('请先登录');
+  const cleanTitle = String(title || '').trim();
+  const cleanContent = String(content || '').trim();
+  if (cleanTitle.length < 2) throw new Error('标题至少写 2 个字');
+  if (cleanContent.length < 5) throw new Error('正文至少写 5 个字');
+
+  const post = {
+    id: makeId('f'),
+    authorId: market.currentUser.id,
+    authorName: market.currentUser.name,
+    authorInitial: market.currentUser.initial,
+    title: cleanTitle,
+    content: cleanContent,
+    topic: topic || '校园趣事',
+    likes: [],
+    createdAt: Date.now()
+  };
+  await putRecord('forumPosts', post);
+  market.forumPosts.unshift(post);
+  return post;
+}
+
+export async function toggleForumLike(postId) {
+  if (!market.currentUser) return 'auth';
+  const post = market.forumPosts.find(item => item.id === postId);
+  if (!post) return 'missing';
+
+  const likes = Array.isArray(post.likes) ? post.likes : [];
+  const index = likes.indexOf(market.currentUser.id);
+  const liked = index < 0;
+  if (liked) likes.push(market.currentUser.id);
+  else likes.splice(index, 1);
+  post.likes = likes;
+  await putRecord('forumPosts', post);
+  return liked;
+}
+
+export async function createGamePost(payload) {
+  if (!market.currentUser) throw new Error('请先登录');
+  const game = String(payload.game || '').trim();
+  const description = String(payload.description || '').trim();
+  if (!game) throw new Error('请填写游戏名称');
+  if (description.length < 4) throw new Error('组队说明至少写 4 个字');
+
+  let link = String(payload.link || '').trim();
+  if (!/^https?:\/\//i.test(link)) link = `https://${link}`;
+  try {
+    new URL(link);
+  } catch (error) {
+    throw new Error('游戏链接格式不正确');
+  }
+
+  const post = {
+    id: makeId('g'),
+    authorId: market.currentUser.id,
+    authorName: market.currentUser.name,
+    authorInitial: market.currentUser.initial,
+    game,
+    platform: payload.platform || '手机',
+    link,
+    playTime: String(payload.playTime || '').trim() || '时间待定',
+    description,
+    contact: String(payload.contact || '').trim(),
+    players: [],
+    createdAt: Date.now()
+  };
+  await putRecord('gamePosts', post);
+  market.gamePosts.unshift(post);
+  return post;
+}
+
+export async function toggleGameJoin(postId) {
+  if (!market.currentUser) return 'auth';
+  const post = market.gamePosts.find(item => item.id === postId);
+  if (!post) return 'missing';
+
+  const players = Array.isArray(post.players) ? post.players : [];
+  const index = players.indexOf(market.currentUser.id);
+  const joined = index < 0;
+  if (joined) players.push(market.currentUser.id);
+  else players.splice(index, 1);
+  post.players = players;
+  await putRecord('gamePosts', post);
+  return joined;
 }

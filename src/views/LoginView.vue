@@ -104,8 +104,8 @@ async function submitRegister() {
 
         <form v-if="mode === 'login'" class="auth-form" @submit.prevent="submitLogin">
           <div class="field">
-            <label class="field-label" for="login-identifier">手机号 / 管理员账号</label>
-            <input id="login-identifier" v-model="loginForm.identifier" class="input" placeholder="例如：13800138000 或 admin" autocomplete="username">
+            <label class="field-label" for="login-identifier">手机号 / 账号</label>
+            <input id="login-identifier" v-model="loginForm.identifier" class="input" placeholder="例如：13800138000 或 admin1" autocomplete="username">
           </div>
           <div class="field">
             <label class="field-label" for="login-password">密码</label>
@@ -116,7 +116,8 @@ async function submitRegister() {
           </button>
           <p class="auth-switch">还没有账号？<button type="button" @click="switchMode('register')">立即注册</button></p>
           <div class="auth-admin-hint">
-            演示管理员：<b>admin</b> / <b>public</b>
+            <span class="hint-line">演示管理员：<b>admin</b> / <b>public</b></span>
+            <span class="hint-line">测试账号：<b>admin1–admin5</b> / <b>public1–public5</b></span>
           </div>
         </form>
 

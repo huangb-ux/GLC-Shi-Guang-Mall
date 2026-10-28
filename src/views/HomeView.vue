@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router';
 import Artwork from '../components/Artwork.vue';
 import CategoryIcon from '../components/CategoryIcon.vue';
 import CampusScenery from '../components/CampusScenery.vue';
+import CampusChannels from '../components/CampusChannels.vue';
 import Icon from '../components/Icon.vue';
 import ItemCard from '../components/ItemCard.vue';
 import {
@@ -150,6 +151,8 @@ function goSearch() {
     </section>
 
     <CampusScenery />
+
+    <CampusChannels />
 
     <section class="section wrap">
       <div class="section-head">

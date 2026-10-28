@@ -12,12 +12,16 @@ import SellerView from '../views/SellerView.vue';
 import CartView from '../views/CartView.vue';
 import OrdersView from '../views/OrdersView.vue';
 import AdminView from '../views/AdminView.vue';
+import ForumView from '../views/ForumView.vue';
+import GamesView from '../views/GamesView.vue';
 import NotFoundView from '../views/NotFoundView.vue';
 import { market } from '../stores/market';
 
 const routes = [
   { path: '/', name: 'home', component: HomeView, meta: { title: '逛集市' } },
   { path: '/search', name: 'search', component: SearchView, meta: { title: '逛集市' } },
+  { path: '/forum', name: 'forum', component: ForumView, meta: { title: '校友论坛' } },
+  { path: '/games', name: 'games', component: GamesView, meta: { title: '游戏天地' } },
   { path: '/item/:id', name: 'item', component: ItemView, meta: { title: '商品详情' } },
   { path: '/seller/:id', name: 'seller', component: SellerView, meta: { title: '卖家主页' } },
   { path: '/login', name: 'login', component: LoginView, meta: { title: '登录 / 注册' } },

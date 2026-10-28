@@ -28,11 +28,11 @@ const year = new Date().getFullYear();
           <RouterLink :to="{ name: 'search', query: { sort: 'new' } }">今日上新</RouterLink>
         </div>
         <div class="footer-col">
-          <h4>关于拾光</h4>
+          <h4>校园频道</h4>
+          <RouterLink to="/forum">校友论坛</RouterLink>
+          <RouterLink to="/games">游戏天地</RouterLink>
           <RouterLink to="/about">我们的故事</RouterLink>
           <RouterLink to="/about">交易安全</RouterLink>
-          <RouterLink to="/about">校园合伙人</RouterLink>
-          <RouterLink to="/about">意见反馈</RouterLink>
         </div>
         <div class="footer-col">
           <h4>联系我们</h4>

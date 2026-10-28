@@ -31,9 +31,10 @@ function sellerName(sellerId) {
   return getSeller(sellerId)?.name || sellerId;
 }
 
-function maskedPhone(phone) {
-  if (!phone) return '管理员账号';
-  return phone.replace(/^(\d{3})\d{4}(\d{4})$/, '$1****$2');
+function accountLabel(account) {
+  if (account.isTest) return '测试账号';
+  if (!account.phone) return '管理员账号';
+  return account.phone.replace(/^(\d{3})\d{4}(\d{4})$/, '$1****$2');
 }
 
 async function resolve(report, verified) {
@@ -141,8 +142,8 @@ function statusLabel(status) {
               <td>
                 <RouterLink class="admin-link" :to="`/seller/${account.id}`">{{ account.name }}</RouterLink>
               </td>
-              <td>{{ maskedPhone(account.phone) }}</td>
-              <td>{{ account.role === 'admin' ? '管理员' : '普通用户' }}</td>
+              <td>{{ accountLabel(account) }}</td>
+              <td>{{ account.role === 'admin' ? '管理员' : account.isTest ? '测试用户' : '普通用户' }}</td>
               <td>
                 <span class="status-tag" :class="account.publishBanned ? 'verified' : 'ok'">
                   {{ account.publishBanned ? '已暂停发布' : '正常' }}
@@ -162,13 +163,15 @@ function statusLabel(status) {
     <div v-else class="admin-db">
       <div class="admin-db-card">
         <h2>IndexedDB · shiguang-db</h2>
-        <p>这是浏览器内置数据库。发布商品会写入 listings 表；下单后商品会从 listings 表删除，并写入 orders 表，所以集市里会自动“出库”。</p>
+        <p>这是浏览器内置数据库。发布商品会写入 listings 表；下单后商品会从 listings 表删除，并写入 orders 表；论坛和游戏内容分别写入 forumPosts / gamePosts。</p>
         <div class="admin-db-grid">
           <div><b>{{ market.accounts.length }}</b><span>accounts</span></div>
           <div><b>{{ market.listings.length }}</b><span>listings</span></div>
           <div><b>{{ market.orders.length }}</b><span>orders</span></div>
           <div><b>{{ market.reports.length }}</b><span>reports</span></div>
           <div><b>{{ market.feedback.length }}</b><span>feedback</span></div>
+          <div><b>{{ market.forumPosts.length }}</b><span>forumPosts</span></div>
+          <div><b>{{ market.gamePosts.length }}</b><span>gamePosts</span></div>
           <div><b>{{ Object.values(market.flags).filter(flag => flag.banned).length }}</b><span>禁发卖家</span></div>
         </div>
         <p class="admin-db-note">提示：GitHub Pages 是静态托管，数据保存在当前浏览器。换成真实后端后，把 <code>src/lib/db.js</code> 替换成 API 请求即可。</p>

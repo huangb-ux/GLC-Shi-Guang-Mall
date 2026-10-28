@@ -1,7 +1,7 @@
 import { normalizeCollege, SEED_LISTINGS } from '../data/site';
 
 const DB_NAME = 'shiguang-db';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 let databasePromise = null;
 
@@ -50,6 +50,18 @@ function openDatabase() {
 
       if (!db.objectStoreNames.contains('sellerFlags')) {
         db.createObjectStore('sellerFlags', { keyPath: 'sellerId' });
+      }
+
+      if (!db.objectStoreNames.contains('forumPosts')) {
+        const store = db.createObjectStore('forumPosts', { keyPath: 'id' });
+        store.createIndex('authorId', 'authorId');
+        store.createIndex('createdAt', 'createdAt');
+      }
+
+      if (!db.objectStoreNames.contains('gamePosts')) {
+        const store = db.createObjectStore('gamePosts', { keyPath: 'id' });
+        store.createIndex('authorId', 'authorId');
+        store.createIndex('createdAt', 'createdAt');
       }
 
       if (!db.objectStoreNames.contains('meta')) {
@@ -155,6 +167,112 @@ function buildSeedListings() {
   });
 }
 
+const TEST_ACCOUNTS = [
+  { username: 'admin1', password: 'public1', name: '阿桂1号', dept: '信息工程学院' },
+  { username: 'admin2', password: 'public2', name: '阿桂2号', dept: '文化与传媒学院' },
+  { username: 'admin3', password: 'public3', name: '阿桂3号', dept: '工商管理学院' },
+  { username: 'admin4', password: 'public4', name: '阿桂4号', dept: '信息工程学院' },
+  { username: 'admin5', password: 'public5', name: '阿桂5号', dept: '旅游与体育健康学院' }
+];
+
+function buildSeedForumPosts() {
+  const now = Date.now();
+  return [
+    {
+      id: 'seed-forum-1',
+      authorId: 'u-admin1',
+      authorName: '阿桂1号',
+      authorInitial: '桂',
+      title: '图书馆三楼靠窗的位置，下午四点的光最好',
+      content: '最近准备考试，天天泡图书馆。三楼靠窗那排下午四点左右会有一束光斜斜地落在桌面上，连翻书的声音都变轻了。有人也喜欢那个位置吗？',
+      topic: '校园趣事',
+      likes: ['u-admin2', 'u-admin3', 'u-admin5'],
+      createdAt: now - 2 * 60 * 60 * 1000
+    },
+    {
+      id: 'seed-forum-2',
+      authorId: 'u-admin2',
+      authorName: '阿桂2号',
+      authorInitial: '桂',
+      title: '有没有人一起夜跑操场？',
+      content: '最近想坚持夜跑，一个人总容易放弃。一般晚上八点半从东门操场开始，配速很慢，跑三公里左右。想找几个同学互相监督，跑完可以一起去乐善食府喝点东西。',
+      topic: '校园日常',
+      likes: ['u-admin1', 'u-admin4'],
+      createdAt: now - 6 * 60 * 60 * 1000
+    },
+    {
+      id: 'seed-forum-3',
+      authorId: 'u-admin3',
+      authorName: '阿桂3号',
+      authorInitial: '桂',
+      title: '整理了一份桂院周边小吃清单',
+      content: '后街的螺蛳粉、雁山市场的炸串、还有校门口那家糖水铺……最近整理了一份自己的桂院周边小吃清单，都是人均二十以内的小店。评论区可以补充，我下次挨个去打卡。',
+      topic: '美食推荐',
+      likes: ['u-admin2', 'u-admin4', 'u-admin5'],
+      createdAt: now - 26 * 60 * 60 * 1000
+    },
+    {
+      id: 'seed-forum-4',
+      authorId: 'u-admin5',
+      authorName: '阿桂5号',
+      authorInitial: '桂',
+      title: '操场捡到一把黑色雨伞，失主看到了吗？',
+      content: '昨晚在操场看台最上面一排捡到一把黑色长柄雨伞，伞柄上有一个小小的白色挂件。先放在东门保安室了，失主可以带着描述去认领。',
+      topic: '失物招领',
+      likes: [],
+      createdAt: now - 30 * 60 * 60 * 1000
+    }
+  ];
+}
+
+function buildSeedGamePosts() {
+  const now = Date.now();
+  return [
+    {
+      id: 'seed-game-1',
+      authorId: 'u-admin4',
+      authorName: '阿桂4号',
+      authorInitial: '桂',
+      game: '王者荣耀',
+      platform: '手机',
+      link: 'https://pvp.qq.com/',
+      playTime: '今晚 21:00',
+      description: '缺一个辅助/游走，段位星耀左右，娱乐局不压力。开麦优先，输赢都开心。',
+      contact: '微信：guilin_wzry',
+      players: ['u-admin5'],
+      createdAt: now - 55 * 60 * 1000
+    },
+    {
+      id: 'seed-game-2',
+      authorId: 'u-admin1',
+      authorName: '阿桂1号',
+      authorInitial: '桂',
+      game: '英雄联盟',
+      platform: 'PC',
+      link: 'https://lol.qq.com/',
+      playTime: '周六 19:30',
+      description: '电一灵活排位，缺打野/中单，翡翠左右，开麦优先。打两把就撤，不熬夜。',
+      contact: 'QQ：1200000002',
+      players: [],
+      createdAt: now - 3 * 60 * 60 * 1000
+    },
+    {
+      id: 'seed-game-3',
+      authorId: 'u-admin2',
+      authorName: '阿桂2号',
+      authorInitial: '桂',
+      game: '永劫无间',
+      platform: 'PC',
+      link: 'https://www.yjwujian.cn/',
+      playTime: '周日 20:00',
+      description: '三排缺一，娱乐为主，会振刀就行。想找固定搭子，以后周末都可以一起。',
+      contact: '微信：guilin_yjwj',
+      players: ['u-admin1'],
+      createdAt: now - 8 * 60 * 60 * 1000
+    }
+  ];
+}
+
 export async function initDatabase() {
   const accounts = await getAll('accounts');
   if (!accounts.some(account => account.username === 'admin')) {
@@ -171,6 +289,33 @@ export async function initDatabase() {
       school: '桂林学院',
       dept: '拾光集运营',
       role: 'admin',
+      verified: true,
+      publishBanned: false,
+      banReason: '',
+      favorites: [],
+      deals: 0,
+      createdAt: Date.now()
+    });
+  }
+
+  // 5 个演示账号：admin1-admin5 / public1-public5（普通用户权限）。
+  for (const test of TEST_ACCOUNTS) {
+    const existing = await getByIndex('accounts', 'username', test.username);
+    if (existing) continue;
+    const salt = randomSalt();
+    const passwordHash = await hashPassword(test.password, salt);
+    await putRecord('accounts', {
+      id: `u-${test.username}`,
+      username: test.username,
+      phone: null,
+      passwordHash,
+      salt,
+      name: test.name,
+      initial: '桂',
+      school: '桂林学院',
+      dept: test.dept,
+      role: 'user',
+      isTest: true,
       verified: true,
       publishBanned: false,
       banReason: '',
@@ -212,6 +357,14 @@ export async function initDatabase() {
       await putRecord('listings', listing);
     }
   }
+
+  // 论坛和游戏天地的演示内容只灌入一次。
+  const communitySeeded = await getRecord('meta', 'communitySeed');
+  if (!communitySeeded) {
+    await Promise.all(buildSeedForumPosts().map(post => putRecord('forumPosts', post)));
+    await Promise.all(buildSeedGamePosts().map(post => putRecord('gamePosts', post)));
+    await putRecord('meta', { key: 'communitySeed', value: true, seededAt: Date.now() });
+  }
 }
 
 export async function createAccount({ name, phone, password, dept }) {
@@ -252,7 +405,7 @@ export async function findAccount(identifier, password) {
     : await getByIndex('accounts', 'username', value);
 
   if (!account) {
-    throw new Error('账号不存在，请检查手机号或管理员账号');
+    throw new Error('账号不存在，请检查手机号或账号');
   }
 
   const passwordHash = await hashPassword(password, account.salt);

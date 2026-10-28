@@ -68,14 +68,15 @@ function logout() {
           {{ user.name }}
           <span class="verified-badge"><Icon name="check" /> 校园实名</span>
           <span v-if="user.role === 'admin'" class="admin-badge">管理员</span>
+          <span v-if="user.isTest" class="admin-badge test-badge">测试账号</span>
           <span v-if="user.publishBanned" class="risk-badge">已暂停发布</span>
         </h1>
         <div class="profile-meta">
           <span>{{ user.school }}</span><span class="sep">/</span>
           <span>{{ user.dept }}</span><span class="sep">·</span>
           <span>{{ joinedText }}</span>
-          <span v-if="user.phone" class="sep">·</span>
-          <span v-if="user.phone">{{ maskedPhone }}</span>
+          <span v-if="user.phone || user.isTest" class="sep">·</span>
+          <span v-if="user.phone || user.isTest">{{ user.isTest ? '测试账号' : maskedPhone }}</span>
         </div>
         <p class="profile-bio">{{ user.bio || '校园实名用户 · 让闲置继续发光。' }}</p>
       </div>
@@ -98,6 +99,8 @@ function logout() {
     <div class="profile-toolbar">
       <RouterLink class="btn btn-outline btn-sm" to="/cart"><Icon name="cart" /> 购物车</RouterLink>
       <RouterLink class="btn btn-outline btn-sm" to="/orders"><Icon name="bag" /> 我的订单</RouterLink>
+      <RouterLink class="btn btn-outline btn-sm" to="/forum"><Icon name="chat" /> 校友论坛</RouterLink>
+      <RouterLink class="btn btn-outline btn-sm" to="/games"><Icon name="play" /> 游戏天地</RouterLink>
       <RouterLink class="btn btn-outline btn-sm" :to="`/seller/${user.id}`"><Icon name="user" /> 卖家主页</RouterLink>
       <RouterLink v-if="user.role === 'admin'" class="btn btn-primary btn-sm" to="/admin"><Icon name="shield" /> 管理后台</RouterLink>
       <button class="btn btn-ghost btn-sm logout-btn" type="button" @click="logout"><Icon name="logout" /> 退出登录</button>

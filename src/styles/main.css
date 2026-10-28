@@ -2857,6 +2857,8 @@ ul, ol { padding: 0; list-style: none; }
   color: var(--muted);
 }
 .auth-admin-hint b { color: var(--green); }
+.hint-line { display: block; line-height: 1.8; }
+.test-badge { background: var(--green-soft); color: var(--green); }
 .auth-back { display: block; text-align: center; margin-top: 18px; font-size: 11.5px; color: var(--muted); }
 .auth-back:hover { color: var(--green); }
 
@@ -3309,6 +3311,613 @@ ul, ol { padding: 0; list-style: none; }
   .campus-track { animation: none; }
   .campus-marquee { overflow-x: auto; }
 }
+
+/* ============================================================
+   校园频道：论坛 / 游戏天地
+   ============================================================ */
+
+.channels-section { padding: 50px 0 16px; }
+.channels-head { align-items: flex-end; }
+.channels-sub {
+  font-size: 12px;
+  color: var(--muted);
+  padding-bottom: 8px;
+}
+.channel-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.channel-card {
+  position: relative;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 28px;
+  border-radius: 26px;
+  transition: transform .3s var(--ease), box-shadow .3s var(--ease);
+}
+.channel-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.channel-forum {
+  background: linear-gradient(135deg, #FFFDF8, #EDF3ED);
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+.channel-games {
+  background: linear-gradient(135deg, #14503C, #0A2C21);
+  border: 1px solid rgba(20, 80, 60, .2);
+  color: var(--cream);
+}
+.channel-watermark {
+  position: absolute;
+  right: -8px;
+  bottom: -48px;
+  font-family: var(--font-serif);
+  font-size: 190px;
+  line-height: 1;
+  color: rgba(20, 80, 60, .055);
+  pointer-events: none;
+}
+.channel-games .channel-watermark { color: rgba(251, 247, 237, .055); }
+.channel-top {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.channel-icon {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: var(--green-soft);
+  color: var(--green);
+}
+.channel-games .channel-icon { background: rgba(251, 247, 237, .1); color: var(--butter); }
+.channel-count {
+  font-size: 9.5px;
+  letter-spacing: .04em;
+  color: var(--muted);
+}
+.channel-games .channel-count { color: rgba(251, 247, 237, .55); }
+.channel-card .eyebrow { margin-bottom: 8px; }
+.channel-games .eyebrow { color: rgba(242, 193, 78, .85); }
+.channel-card h3 {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-serif);
+  font-size: 30px;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+.channel-desc {
+  position: relative;
+  z-index: 1;
+  max-width: 430px;
+  font-size: 11.5px;
+  line-height: 1.9;
+  color: var(--muted);
+}
+.channel-games .channel-desc { color: rgba(251, 247, 237, .64); }
+.channel-preview {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 6px;
+  margin-top: 17px;
+  padding-top: 13px;
+  border-top: 1px dashed rgba(20, 80, 60, .18);
+}
+.channel-games .channel-preview { border-top-color: rgba(251, 247, 237, .16); }
+.channel-preview li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 10.5px;
+  color: var(--ink-soft);
+}
+.channel-games .channel-preview li { color: rgba(251, 247, 237, .78); }
+.channel-preview li span {
+  flex: none;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(242, 193, 78, .2);
+  color: #76551C;
+  font-size: 8.5px;
+}
+.channel-games .channel-preview li span { background: rgba(242, 193, 78, .15); color: var(--butter); }
+.channel-more {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 18px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--green);
+}
+.channel-games .channel-more { color: var(--butter); }
+.channel-more .icon { width: 14px; height: 14px; }
+.channel-card:hover .channel-more .icon { transform: translateX(4px); }
+.channel-more .icon { transition: transform .2s; }
+
+/* 论坛 / 游戏页共用 hero */
+.channel-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 28px;
+  padding: 56px 0 30px;
+}
+.channel-hero h1 {
+  max-width: 780px;
+  margin: 8px 0 12px;
+  font-family: var(--font-serif);
+  font-size: clamp(36px, 4.6vw, 58px);
+  line-height: 1.18;
+  letter-spacing: -.02em;
+}
+.channel-lead {
+  max-width: 620px;
+  font-size: 13.5px;
+  line-height: 1.9;
+  color: var(--muted);
+}
+.channel-cta { flex: none; margin-bottom: 7px; }
+.games-hero { padding-bottom: 22px; }
+.games-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 11px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--green);
+  color: var(--cream);
+  font-size: 12px;
+  font-weight: 700;
+  transition: background .2s, transform .2s;
+}
+.games-cta:hover { background: var(--green-dark); transform: translateY(-1px); }
+.games-cta .icon { width: 15px; height: 15px; }
+
+.forum-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 28px;
+  padding-bottom: 76px;
+}
+.forum-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 17px;
+}
+.forum-topics { display: flex; flex-wrap: wrap; gap: 7px; }
+.topic-pill {
+  padding: 6px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 253, 248, .66);
+  color: var(--muted);
+  font-size: 10.5px;
+  transition: color .2s, background .2s, border-color .2s;
+}
+.topic-pill:hover { color: var(--green); border-color: rgba(20, 80, 60, .25); }
+.topic-pill.active { background: var(--green); border-color: var(--green); color: var(--cream); }
+.forum-count { flex: none; font-size: 10px; color: var(--muted); }
+
+.forum-composer {
+  margin-bottom: 18px;
+  padding: 25px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+}
+.composer-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.composer-head h2 {
+  margin-top: 4px;
+  font-family: var(--font-serif);
+  font-size: 24px;
+  line-height: 1.3;
+}
+.composer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 16px;
+}
+.panel-enter-active,
+.panel-leave-active { transition: opacity .2s, transform .2s; }
+.panel-enter-from,
+.panel-leave-to { opacity: 0; transform: translateY(-8px); }
+
+.forum-feed { display: grid; gap: 13px; }
+.forum-card {
+  padding: 23px;
+  border: 1px solid var(--line);
+  border-radius: 23px;
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  transition: border-color .2s, transform .2s, box-shadow .2s;
+}
+.forum-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-md);
+}
+.forum-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 13px;
+}
+.forum-avatar {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  flex: none;
+  border-radius: 50%;
+  background: var(--green-soft);
+  color: var(--green);
+  font-family: var(--font-serif);
+  font-size: 18px;
+}
+.forum-author { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.forum-author b { font-size: 12.5px; }
+.forum-author span { font-size: 9.5px; color: var(--muted); }
+.forum-topic {
+  margin-left: auto;
+  flex: none;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(242, 193, 78, .17);
+  color: #725319;
+  font-size: 9px;
+}
+.forum-card h2 {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  line-height: 1.38;
+  margin-bottom: 8px;
+}
+.forum-content {
+  font-size: 12.5px;
+  line-height: 1.95;
+  color: var(--ink-soft);
+  white-space: pre-line;
+}
+.forum-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+}
+.forum-like {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-size: 10.5px;
+}
+.forum-like:hover { color: var(--orange); }
+.forum-like.liked { color: var(--orange); }
+.forum-like.liked .icon { fill: currentColor; }
+.forum-like .icon { width: 15px; height: 15px; }
+.forum-tip { font-size: 8.5px; letter-spacing: .04em; color: var(--muted); opacity: .65; }
+
+.forum-side {
+  position: sticky;
+  top: 105px;
+  align-self: start;
+  display: grid;
+  gap: 14px;
+}
+.forum-side-card {
+  padding: 23px;
+  border-radius: 22px;
+  background: linear-gradient(145deg, #14503C, #0D3427);
+  color: var(--cream);
+}
+.forum-side-card .eyebrow { color: rgba(242, 193, 78, .8); }
+.forum-side-card h3 {
+  margin: 7px 0 12px;
+  font-family: var(--font-serif);
+  font-size: 22px;
+}
+.forum-side-card ul { display: grid; gap: 8px; }
+.forum-side-card li {
+  position: relative;
+  padding-left: 13px;
+  font-size: 10.5px;
+  line-height: 1.75;
+  color: rgba(251, 247, 237, .7);
+}
+.forum-side-card li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: .7em;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--butter);
+}
+.forum-side-note {
+  padding: 19px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 19px;
+  color: var(--muted);
+}
+.forum-side-note .icon { color: var(--orange); margin-bottom: 7px; }
+.forum-side-note p { font-size: 10px; line-height: 1.8; }
+
+/* 游戏天地 */
+.games-page { padding-bottom: 20px; }
+.games-stats {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-bottom: 23px;
+  padding: 15px 19px;
+  border: 1px solid var(--line);
+  border-radius: 17px;
+  background: rgba(255, 253, 248, .64);
+}
+.games-stats > div { display: flex; align-items: baseline; gap: 6px; flex: none; }
+.games-stats b {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  color: var(--green);
+}
+.games-stats span { font-size: 9.5px; color: var(--muted); }
+.games-stats p {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+  font-size: 9.5px;
+  color: var(--muted);
+}
+.games-stats p .icon { width: 13px; height: 13px; color: var(--green); }
+.games-toolbar { margin-bottom: 16px; }
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 17px;
+  padding-bottom: 38px;
+}
+.game-card {
+  position: relative;
+  overflow: hidden;
+  padding: 23px;
+  border-radius: 24px;
+  background: linear-gradient(145deg, #14503C, #0A2C21);
+  color: var(--cream);
+  box-shadow: var(--shadow-md);
+}
+.game-card::after {
+  content: "";
+  position: absolute;
+  right: -45px;
+  top: -70px;
+  width: 210px;
+  height: 210px;
+  border: 1px dashed rgba(251, 247, 237, .12);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.game-card-head {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.game-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border: 1px solid rgba(242, 193, 78, .3);
+  border-radius: 999px;
+  color: var(--butter);
+  font-size: 9px;
+}
+.game-badge .icon { width: 12px; height: 12px; }
+.game-time { font-size: 9.5px; color: rgba(251, 247, 237, .55); }
+.game-card h2 {
+  position: relative;
+  z-index: 1;
+  margin: 15px 0 7px;
+  font-family: var(--font-serif);
+  font-size: 30px;
+  line-height: 1.2;
+}
+.game-desc {
+  position: relative;
+  z-index: 1;
+  min-height: 44px;
+  font-size: 11.5px;
+  line-height: 1.9;
+  color: rgba(251, 247, 237, .72);
+}
+.game-meta {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 11px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(251, 247, 237, .16);
+  color: rgba(251, 247, 237, .5);
+  font-size: 9px;
+}
+.game-meta span { display: inline-flex; align-items: center; gap: 4px; }
+.game-meta .icon { width: 12px; height: 12px; }
+.game-contact {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 12px;
+  padding: 5px 8px;
+  border-radius: 7px;
+  background: rgba(251, 247, 237, .07);
+  color: rgba(251, 247, 237, .7);
+  font-size: 9.5px;
+}
+.game-contact .icon { width: 12px; height: 12px; color: var(--butter); }
+.game-card-foot {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 17px;
+}
+.game-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--butter);
+  font-size: 10px;
+  font-weight: 700;
+}
+.game-link .icon { width: 13px; height: 13px; }
+.game-copy {
+  max-width: 105px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: rgba(251, 247, 237, .4);
+  font-size: 8.5px;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.game-join {
+  margin-left: auto;
+  padding: 7px 10px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: var(--butter);
+  color: #3F2F0B;
+  font-size: 10px;
+  font-weight: 700;
+}
+.game-join .icon { width: 12px; height: 12px; }
+.game-join.joined { background: rgba(251, 247, 237, .1); border-color: rgba(251, 247, 237, .16); color: var(--cream); }
+.games-note {
+  padding: 2px 0 54px;
+  text-align: center;
+  font-size: 9.5px;
+  color: var(--muted);
+}
+
+@media (max-width: 1100px) {
+  .forum-layout { grid-template-columns: minmax(0, 1fr) 260px; gap: 20px; }
+  .channel-card { padding: 23px; min-height: 280px; }
+  .channel-card h3 { font-size: 26px; }
+}
+
+@media (max-width: 900px) {
+  .channels-section { padding-top: 38px; }
+  .channel-grid { gap: 12px; }
+  .channel-card { min-height: 260px; padding: 21px; }
+  .channel-card h3 { font-size: 24px; }
+  .channel-preview { display: none; }
+  .forum-layout { grid-template-columns: 1fr; }
+  .forum-side { position: static; grid-template-columns: 1fr 1fr; }
+  .game-grid { gap: 12px; }
+  .game-card { padding: 20px; }
+  .game-card h2 { font-size: 26px; }
+  .games-stats { flex-wrap: wrap; gap: 12px 20px; }
+  .games-stats p { flex-basis: 100%; margin-left: 0; }
+}
+
+@media (max-width: 640px) {
+  .channels-section { padding: 30px 0 6px; }  .channels-head { display: block; }
+  .channels-sub { padding: 5px 0 0; }
+  .channel-grid { grid-template-columns: 1fr; }
+  .channel-card { min-height: 238px; padding: 21px; }
+  .channel-card h3 { font-size: 26px; }
+  .channel-top { margin-bottom: 15px; }
+  .channel-desc { font-size: 11px; }
+  .channel-watermark { font-size: 150px; bottom: -34px; }
+  .channel-more { padding-top: 13px; }
+
+  .channel-hero { flex-direction: column; align-items: flex-start; gap: 17px; padding: 32px 0 22px; }
+  .channel-hero h1 { font-size: 36px; }
+  .channel-lead { font-size: 12px; }
+  .channel-cta { margin-bottom: 0; }
+  .forum-toolbar { align-items: flex-start; }
+  .forum-topics { gap: 5px; }
+  .topic-pill { padding: 5px 8px; font-size: 9.5px; }
+  .forum-count { padding-top: 5px; font-size: 9px; }
+  .forum-composer { padding: 18px; }
+  .composer-head h2 { font-size: 21px; }
+  .composer-actions { align-items: flex-end; flex-direction: column; }
+  .forum-card { padding: 18px; border-radius: 19px; }
+  .forum-card h2 { font-size: 21px; }
+  .forum-content { font-size: 12px; }
+  .forum-tip { display: none; }
+  .forum-side { grid-template-columns: 1fr; }
+  .games-stats b { font-size: 19px; }
+  .game-grid { grid-template-columns: 1fr; }
+  .game-card { padding: 21px; }
+  .game-card h2 { font-size: 27px; }
+  .game-desc { min-height: 0; }
+  .game-card-foot { flex-wrap: wrap; }
+  .game-join { margin-left: 0; }
+  .games-note { padding-bottom: 34px; }
+}
+
+/* 六个导航入口需要更紧凑的头部，避免中文竖排换行 */
+.header-inner { gap: 18px; }
+.main-nav { flex: none; }
+.nav-link {
+  padding: 8px 9px;
+  font-size: 13.5px;
+  white-space: nowrap;
+}
+.header-search { flex: 0 1 300px; }
+@media (max-width: 1500px) {
+  .school-pill { display: none; }
+}
+
 
 
 
