@@ -32,6 +32,11 @@ watch(
 </script>
 
 <template>
+  <div class="ambient-deco" aria-hidden="true">
+    <span class="ambient-ring"></span>
+    <span class="ambient-glyph">拾</span>
+    <span class="ambient-coord">GUILIN UNIVERSITY · 2026</span>
+  </div>
   <SiteHeader />
   <main id="app" tabindex="-1">
     <RouterView v-slot="{ Component }">
