@@ -1,4 +1,4 @@
-import { SEED_LISTINGS } from '../data/site';
+import { normalizeCollege, SEED_LISTINGS } from '../data/site';
 
 const DB_NAME = 'shiguang-db';
 const DB_VERSION = 1;
@@ -190,6 +190,28 @@ export async function initDatabase() {
     // 老数据已经存在时，只补一个标记，避免以后把演示商品再次灌入。
     await putRecord('meta', { key: 'seed', value: true, seededAt: Date.now() });
   }
+
+  // 把旧版本里不准确的院系名称迁移到桂林学院官网当前名单。
+  const allAccounts = await getAll('accounts');
+  for (const account of allAccounts) {
+    if (account.role === 'admin' || !account.dept) continue;
+    const normalized = normalizeCollege(account.dept);
+    if (normalized !== account.dept) {
+      account.dept = normalized;
+      await putRecord('accounts', account);
+    }
+  }
+
+  const allListings = await getAll('listings');
+  for (const listing of allListings) {
+    const current = listing.seller?.dept;
+    if (!current) continue;
+    const normalized = normalizeCollege(current);
+    if (normalized !== current) {
+      listing.seller.dept = normalized;
+      await putRecord('listings', listing);
+    }
+  }
 }
 
 export async function createAccount({ name, phone, password, dept }) {
@@ -209,7 +231,7 @@ export async function createAccount({ name, phone, password, dept }) {
     name: name.trim(),
     initial: name.trim().slice(0, 1) || '同',
     school: '桂林学院',
-    dept: dept?.trim() || '未填写学院',
+    dept: normalizeCollege(dept || '信息工程学院'),
     role: 'user',
     verified: true,
     publishBanned: false,

@@ -20,6 +20,50 @@ export const SCHOOL = {
 
 export const AREAS = SCHOOL.areas;
 
+export const COLLEGES = [
+  "马克思主义学院",
+  "外国语学院（国际教育学院）",
+  "文化与传媒学院",
+  "工商管理学院",
+  "信息工程学院",
+  "金融与法律学院",
+  "教育与音乐学院",
+  "城市设计学院",
+  "旅游与体育健康学院"
+];
+
+// 旧版本里出现过的不准确院系名称，统一映射到官网名称。
+export const COLLEGE_ALIASES = {
+  "机械工程学院": "信息工程学院",
+  "外国语学院": "外国语学院（国际教育学院）",
+  "新闻传播学院": "文化与传媒学院",
+  "美术学院": "城市设计学院",
+  "建筑学院": "城市设计学院",
+  "数学学院": "信息工程学院",
+  "经济学院": "工商管理学院",
+  "设计学院": "城市设计学院",
+  "软件学院": "信息工程学院",
+  "文学院": "文化与传媒学院",
+  "物理学院": "信息工程学院",
+  "土木工程学院": "城市设计学院",
+  "天文学院": "城市设计学院",
+  "教育学院": "教育与音乐学院",
+  "材料学院": "信息工程学院",
+  "体育学院": "旅游与体育健康学院",
+  "生命科学学院": "城市设计学院",
+  "视觉传达": "城市设计学院"
+};
+
+export function normalizeCollege(dept) {
+  const value = String(dept || '').trim();
+  if (!value) return '信息工程学院';
+  if (COLLEGES.includes(value)) return value;
+
+  const base = value.split('·')[0].trim();
+  if (COLLEGES.includes(base)) return base;
+  return COLLEGE_ALIASES[value] || COLLEGE_ALIASES[base] || base;
+}
+
 export const CATEGORIES = [
   {
     "id": "digital",
@@ -111,7 +155,7 @@ export const MOCK_USER = {
   "name": "林小满",
   "initial": "满",
   "school": "桂林学院",
-  "dept": "信息工程学院 · 大四",
+  "dept": "信息工程学院",
   "rating": 4.9,
   "deals": 12,
   "joined": "2022 年 9 月",
@@ -143,7 +187,7 @@ export const SEED_LISTINGS = [
       "name": "陈屿",
       "initial": "屿",
       "school": "桂林学院",
-      "dept": "机械工程学院",
+      "dept": "信息工程学院",
       "rating": 4.9,
       "deals": 8,
       "verified": true,
@@ -174,7 +218,7 @@ export const SEED_LISTINGS = [
       "name": "阿黛",
       "initial": "黛",
       "school": "桂林学院",
-      "dept": "外国语学院",
+      "dept": "外国语学院（国际教育学院）",
       "rating": 5,
       "deals": 23,
       "verified": true,
@@ -205,7 +249,7 @@ export const SEED_LISTINGS = [
       "name": "苏禾",
       "initial": "禾",
       "school": "桂林学院",
-      "dept": "新闻传播学院",
+      "dept": "文化与传媒学院",
       "rating": 4.8,
       "deals": 15,
       "verified": true,
@@ -235,7 +279,7 @@ export const SEED_LISTINGS = [
       "name": "晚晚",
       "initial": "晚",
       "school": "桂林学院",
-      "dept": "美术学院",
+      "dept": "城市设计学院",
       "rating": 4.9,
       "deals": 6,
       "verified": true,
@@ -266,7 +310,7 @@ export const SEED_LISTINGS = [
       "name": "周野",
       "initial": "野",
       "school": "桂林学院",
-      "dept": "建筑学院",
+      "dept": "城市设计学院",
       "rating": 4.7,
       "deals": 4,
       "verified": true,
@@ -297,7 +341,7 @@ export const SEED_LISTINGS = [
       "name": "老白",
       "initial": "白",
       "school": "桂林学院",
-      "dept": "数学学院",
+      "dept": "信息工程学院",
       "rating": 4.8,
       "deals": 11,
       "verified": true,
@@ -327,7 +371,7 @@ export const SEED_LISTINGS = [
       "name": "一颗桃",
       "initial": "桃",
       "school": "桂林学院",
-      "dept": "经济学院",
+      "dept": "工商管理学院",
       "rating": 4.9,
       "deals": 9,
       "verified": true,
@@ -357,7 +401,7 @@ export const SEED_LISTINGS = [
       "name": "Kiki",
       "initial": "K",
       "school": "桂林学院",
-      "dept": "设计学院",
+      "dept": "城市设计学院",
       "rating": 4.6,
       "deals": 3,
       "verified": false,
@@ -388,7 +432,7 @@ export const SEED_LISTINGS = [
       "name": "林一",
       "initial": "一",
       "school": "桂林学院",
-      "dept": "软件学院",
+      "dept": "信息工程学院",
       "rating": 4.9,
       "deals": 17,
       "verified": true,
@@ -418,7 +462,7 @@ export const SEED_LISTINGS = [
       "name": "迟雨",
       "initial": "雨",
       "school": "桂林学院",
-      "dept": "文学院",
+      "dept": "文化与传媒学院",
       "rating": 4.8,
       "deals": 7,
       "verified": true,
@@ -448,7 +492,7 @@ export const SEED_LISTINGS = [
       "name": "阿哲",
       "initial": "哲",
       "school": "桂林学院",
-      "dept": "物理学院",
+      "dept": "信息工程学院",
       "rating": 4.5,
       "deals": 2,
       "verified": true,
@@ -478,7 +522,7 @@ export const SEED_LISTINGS = [
       "name": "大川",
       "initial": "川",
       "school": "桂林学院",
-      "dept": "土木工程学院",
+      "dept": "城市设计学院",
       "rating": 4.7,
       "deals": 5,
       "verified": true,
@@ -508,7 +552,7 @@ export const SEED_LISTINGS = [
       "name": "星野",
       "initial": "星",
       "school": "桂林学院",
-      "dept": "天文学院",
+      "dept": "城市设计学院",
       "rating": 4.9,
       "deals": 13,
       "verified": true,
@@ -538,7 +582,7 @@ export const SEED_LISTINGS = [
       "name": "小满",
       "initial": "满",
       "school": "桂林学院",
-      "dept": "教育学院",
+      "dept": "教育与音乐学院",
       "rating": 5,
       "deals": 21,
       "verified": true,
@@ -569,7 +613,7 @@ export const SEED_LISTINGS = [
       "name": "老K",
       "initial": "K",
       "school": "桂林学院",
-      "dept": "材料学院",
+      "dept": "信息工程学院",
       "rating": 4.6,
       "deals": 6,
       "verified": true,
@@ -599,7 +643,7 @@ export const SEED_LISTINGS = [
       "name": "阿飞",
       "initial": "飞",
       "school": "桂林学院",
-      "dept": "体育学院",
+      "dept": "旅游与体育健康学院",
       "rating": 4.8,
       "deals": 10,
       "verified": true,
@@ -629,7 +673,7 @@ export const SEED_LISTINGS = [
       "name": "青禾",
       "initial": "青",
       "school": "桂林学院",
-      "dept": "生命科学学院",
+      "dept": "城市设计学院",
       "rating": 4.9,
       "deals": 8,
       "verified": true,
@@ -659,7 +703,7 @@ export const SEED_LISTINGS = [
       "name": "木木",
       "initial": "木",
       "school": "桂林学院",
-      "dept": "视觉传达",
+      "dept": "城市设计学院",
       "rating": 4.8,
       "deals": 12,
       "verified": true,

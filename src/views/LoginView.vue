@@ -2,8 +2,9 @@
 import { computed, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import Icon from '../components/Icon.vue';
-import { loginAccount, registerAccount, market } from '../stores/market';
+import { loginAccount, registerAccount } from '../stores/market';
 import { toast } from '../stores/ui';
+import { COLLEGES } from '../data/site';
 
 const route = useRoute();
 const router = useRouter();
@@ -12,7 +13,7 @@ const submitting = ref(false);
 const error = ref('');
 
 const loginForm = reactive({ identifier: '', password: '' });
-const registerForm = reactive({ name: '', phone: '', dept: '', password: '', confirm: '' });
+const registerForm = reactive({ name: '', phone: '', dept: COLLEGES[4], password: '', confirm: '' });
 
 const redirectTo = computed(() => {
   const target = String(route.query.redirect || '/');
@@ -131,8 +132,11 @@ async function submitRegister() {
             </div>
           </div>
           <div class="field">
-            <label class="field-label" for="reg-dept">学院 / 专业 <span class="opt">选填</span></label>
-            <input id="reg-dept" v-model="registerForm.dept" class="input" placeholder="例如：信息工程学院 · 软件工程">
+            <label class="field-label" for="reg-dept">所属学院<span class="req">*</span></label>
+            <select id="reg-dept" v-model="registerForm.dept" class="select">
+              <option v-for="college in COLLEGES" :key="college" :value="college">{{ college }}</option>
+            </select>
+            <p class="field-hint">院系名称按桂林学院官网「机构设置」整理。</p>
           </div>
           <div class="form-row">
             <div class="field">
