@@ -10,7 +10,7 @@ import {
   rememberSearch
 } from '../stores/market';
 import { toast, ui } from '../stores/ui';
-import { AREAS, CATEGORIES, CONDITIONS } from '../data/site';
+import { CATEGORIES, CONDITIONS } from '../data/site';
 import { categoryName } from '../lib/format';
 
 const route = useRoute();
@@ -21,7 +21,6 @@ const filters = reactive({
   q: '',
   cat: 'all',
   cond: 'all',
-  area: 'all',
   min: '',
   max: '',
   sort: 'new'
@@ -31,7 +30,6 @@ function syncFromRoute() {
   filters.q = String(route.query.q || '');
   filters.cat = String(route.query.cat || 'all');
   filters.cond = String(route.query.cond || 'all');
-  filters.area = String(route.query.area || 'all');
   filters.min = String(route.query.min || '');
   filters.max = String(route.query.max || '');
   filters.sort = String(route.query.sort || 'new');
@@ -44,7 +42,6 @@ const result = computed(() => getFilteredListings(route.query));
 const resultCount = computed(() => result.value.length);
 
 const currentCat = computed(() => String(route.query.cat || 'all'));
-const currentSort = computed(() => String(route.query.sort || 'new'));
 
 const pageTitle = computed(() => {
   const q = String(route.query.q || '');
@@ -67,7 +64,6 @@ const activeChips = computed(() => {
   if (query.q) chips.push({ key: 'q', label: `搜索：${query.q}` });
   if (query.cat && query.cat !== 'all') chips.push({ key: 'cat', label: categoryName(String(query.cat)) });
   if (query.cond && query.cond !== 'all') chips.push({ key: 'cond', label: String(query.cond) });
-  if (query.area && query.area !== 'all') chips.push({ key: 'area', label: String(query.area) });
   if (query.min || query.max) {
     chips.push({ key: 'price', label: `¥${query.min || 0} – ${query.max || '不限'}` });
   }
@@ -79,7 +75,6 @@ function cleanQuery() {
   if (filters.q.trim()) query.q = filters.q.trim();
   if (filters.cat !== 'all') query.cat = filters.cat;
   if (filters.cond !== 'all') query.cond = filters.cond;
-  if (filters.area !== 'all') query.area = filters.area;
   if (filters.min !== '') query.min = String(filters.min);
   if (filters.max !== '') query.max = String(filters.max);
   if (filters.sort !== 'new') query.sort = filters.sort;
@@ -200,14 +195,6 @@ function openFilters() {
             <span>—</span>
             <input v-model="filters.max" type="number" min="0" inputmode="numeric" placeholder="最高" @change="handleFilterChange">
           </div>
-        </div>
-
-        <div class="filter-group">
-          <p class="filter-title">校内地点</p>
-          <select v-model="filters.area" class="filter-select" @change="handleFilterChange">
-            <option value="all">全部地点</option>
-            <option v-for="area in AREAS" :key="area" :value="area">{{ area }}</option>
-          </select>
         </div>
 
         <div class="filters-footer">

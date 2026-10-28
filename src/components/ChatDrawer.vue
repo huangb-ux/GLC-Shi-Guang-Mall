@@ -119,7 +119,7 @@ function send(rawText) {
           <span class="thumb"><Artwork :item="item" /></span>
           <span>
             <b>{{ item.title }}</b>
-            <span>{{ item.condition }} · {{ item.area }}</span>
+            <span>{{ item.condition }} · 校内面交</span>
           </span>
           <span class="price">¥{{ fmtPrice(item.price) }}</span>
         </div>
@@ -132,7 +132,7 @@ function send(rawText) {
             class="chat-msg"
             :class="message.from === 'me' ? 'me' : 'them'"
           >
-            <span class="msg-avatar">{{ message.from === 'me' ? market.user.initial : item.seller.initial }}</span>
+            <span class="msg-avatar">{{ message.from === 'me' ? (market.currentUser?.initial || '我') : item.seller.initial }}</span>
             <div class="bubble-wrap">
               <div class="msg-bubble">{{ message.text }}</div>
               <span class="msg-time">{{ clockTime(message.ts) }}</span>

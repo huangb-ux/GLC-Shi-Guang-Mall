@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import Artwork from '../components/Artwork.vue';
 import EmptyState from '../components/EmptyState.vue';
 import Icon from '../components/Icon.vue';
@@ -9,16 +9,30 @@ import {
   deleteListing,
   favoriteCount,
   favoriteListings,
+  logoutAccount,
   market,
+  myOrders,
   toggleListingStatus
 } from '../stores/market';
-import { confirmAction, toast } from '../stores/ui';
+import { closeChat, confirmAction, toast } from '../stores/ui';
 import { fmtPrice, timeAgo } from '../lib/format';
 
 const route = useRoute();
+const router = useRouter();
 const tab = computed(() => (route.query.tab === 'favorites' ? 'favorites' : 'listings'));
 const myListings = computed(() => market.myListings);
 const favorites = computed(() => favoriteListings.value);
+const user = computed(() => market.currentUser);
+const maskedPhone = computed(() => {
+  const phone = user.value?.phone || '';
+  return phone.replace(/^(\d{3})\d{4}(\d{4})$/, '$1****$2');
+});
+const joinedText = computed(() => {
+  if (user.value?.joined) return user.value.joined;
+  if (!user.value?.createdAt) return '';
+  const date = new Date(user.value.createdAt);
+  return `${date.getFullYear()} 年 ${date.getMonth() + 1} 月加入`;
+});
 
 async function removeListing(listing) {
   const confirmed = await confirmAction({
@@ -28,37 +42,65 @@ async function removeListing(listing) {
     danger: true
   });
   if (!confirmed) return;
-  deleteListing(listing.id);
+  await deleteListing(listing.id);
   toast('已删除');
 }
 
-function toggleStatus(listing) {
-  toggleListingStatus(listing.id);
+async function toggleStatus(listing) {
+  await toggleListingStatus(listing.id);
   toast(listing.status === 'paused' ? '已下架，可随时重新上架' : '已重新上架');
+}
+
+function logout() {
+  closeChat();
+  logoutAccount();
+  toast('已退出登录');
+  router.push('/');
 }
 </script>
 
 <template>
-  <div class="page page-fade me-page wrap">
+  <div v-if="user" class="page page-fade me-page wrap">
     <div class="profile-card">
-      <span class="profile-avatar">{{ market.user.initial }}</span>
+      <span class="profile-avatar">{{ user.initial }}</span>
       <div class="profile-main">
         <h1 class="profile-name">
-          {{ market.user.name }}
+          {{ user.name }}
           <span class="verified-badge"><Icon name="check" /> 校园实名</span>
+          <span v-if="user.role === 'admin'" class="admin-badge">管理员</span>
+          <span v-if="user.publishBanned" class="risk-badge">已暂停发布</span>
         </h1>
         <div class="profile-meta">
-          <span>{{ market.user.school }}</span><span class="sep">/</span>
-          <span>{{ market.user.dept }}</span><span class="sep sep-joined">/</span>
-          <span class="profile-joined">{{ market.user.joined }}加入</span>
+          <span>{{ user.school }}</span><span class="sep">/</span>
+          <span>{{ user.dept }}</span><span class="sep">·</span>
+          <span>{{ joinedText }}</span>
+          <span v-if="user.phone" class="sep">·</span>
+          <span v-if="user.phone">{{ maskedPhone }}</span>
         </div>
-        <p class="profile-bio">{{ market.user.bio }}</p>
+        <p class="profile-bio">{{ user.bio || '校园实名用户 · 让闲置继续发光。' }}</p>
       </div>
       <div class="profile-stats">
         <div class="profile-stat"><b>{{ myListings.length }}</b><span>发布</span></div>
         <div class="profile-stat"><b>{{ favoriteCount }}</b><span>收藏</span></div>
-        <div class="profile-stat"><b>{{ market.user.deals }}</b><span>成交</span></div>
+        <div class="profile-stat"><b>{{ myOrders.length }}</b><span>订单</span></div>
       </div>
+    </div>
+
+    <div v-if="user.publishBanned" class="risk-banner">
+      <Icon name="shield" />
+      <div>
+        <b>发布权限已暂停</b>
+        <p>{{ user.banReason || '因收到 3 位买家举报并核实，平台已暂停你的发布权限。' }}</p>
+      </div>
+      <RouterLink class="btn btn-outline btn-sm" :to="`/seller/${user.id}`">查看卖家主页</RouterLink>
+    </div>
+
+    <div class="profile-toolbar">
+      <RouterLink class="btn btn-outline btn-sm" to="/cart"><Icon name="cart" /> 购物车</RouterLink>
+      <RouterLink class="btn btn-outline btn-sm" to="/orders"><Icon name="bag" /> 我的订单</RouterLink>
+      <RouterLink class="btn btn-outline btn-sm" :to="`/seller/${user.id}`"><Icon name="user" /> 卖家主页</RouterLink>
+      <RouterLink v-if="user.role === 'admin'" class="btn btn-primary btn-sm" to="/admin"><Icon name="shield" /> 管理后台</RouterLink>
+      <button class="btn btn-ghost btn-sm logout-btn" type="button" @click="logout"><Icon name="logout" /> 退出登录</button>
     </div>
 
     <div class="tabs" role="tablist">

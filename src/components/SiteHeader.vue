@@ -3,8 +3,10 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import Icon from './Icon.vue';
 import {
+  cartCount,
   clearSearches,
   favoriteCount,
+  isAdmin,
   market,
   rememberSearch,
   unreadTotal
@@ -18,6 +20,7 @@ const query = ref('');
 const searchOpen = ref(false);
 const searchInput = ref(null);
 const recent = computed(() => market.searches);
+const currentUser = computed(() => market.currentUser);
 
 watch(
   () => route.query.q,
@@ -114,6 +117,7 @@ const isMe = computed(() => route.name === 'me' || route.name === 'favorites');
           <span v-if="unreadTotal" class="nav-dot"></span>
         </RouterLink>
         <RouterLink to="/me" class="nav-link" :class="{ 'is-active': isMe }">我的</RouterLink>
+        <RouterLink v-if="isAdmin" to="/admin" class="nav-link" :class="{ 'is-active': route.name === 'admin' }">管理</RouterLink>
       </nav>
 
       <form class="header-search" role="search" autocomplete="off" @submit.prevent="submitSearch">
@@ -166,6 +170,10 @@ const isMe = computed(() => route.name === 'me' || route.name === 'favorites');
       </form>
 
       <div class="header-actions">
+        <RouterLink class="icon-btn cart-link" to="/cart" aria-label="购物车">
+          <Icon name="cart" />
+          <span class="count-badge" :data-zero="cartCount === 0">{{ cartCount }}</span>
+        </RouterLink>
         <RouterLink class="icon-btn fav-link" to="/favorites" aria-label="我的收藏">
           <Icon name="heart" />
           <span id="fav-count" class="count-badge" :data-zero="favoriteCount === 0">{{ favoriteCount }}</span>
@@ -174,7 +182,14 @@ const isMe = computed(() => route.name === 'me' || route.name === 'favorites');
         <RouterLink class="icon-btn mobile-search-btn" to="/search" aria-label="搜索好物">
           <Icon name="search" />
         </RouterLink>
-        <RouterLink class="avatar-btn" to="/me" aria-label="个人中心"><span class="avatar">满</span></RouterLink>
+        <RouterLink
+          class="avatar-btn"
+          :to="currentUser ? '/me' : '/login'"
+          :aria-label="currentUser ? '个人中心' : '登录 / 注册'"
+          :title="currentUser ? currentUser.name : '登录 / 注册'"
+        >
+          <span class="avatar">{{ currentUser ? currentUser.initial : '登' }}</span>
+        </RouterLink>
       </div>
     </div>
   </header>

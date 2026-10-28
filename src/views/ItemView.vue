@@ -1,13 +1,15 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import Artwork from '../components/Artwork.vue';
 import Icon from '../components/Icon.vue';
 import ItemCard from '../components/ItemCard.vue';
 import NotFoundView from './NotFoundView.vue';
 import {
   activeListings,
+  addToCart,
   getListing,
+  getSeller,
   isMine,
   market,
   toggleFavorite,
@@ -16,13 +18,13 @@ import {
 import { openChat, toast } from '../stores/ui';
 import {
   categoryName,
-  categoryOf,
   fmtPrice,
   timeAgo,
   variantTones
 } from '../lib/format';
 
 const route = useRoute();
+const router = useRouter();
 const activeIndex = ref(0);
 
 const item = computed(() => getListing(String(route.params.id)));
@@ -53,6 +55,7 @@ const variants = computed(() => {
 const currentVariant = computed(() => variants.value[activeIndex.value] || variants.value[0] || {});
 const mine = computed(() => isMine(item.value));
 const available = computed(() => item.value?.status !== 'paused');
+const sellerProfile = computed(() => (item.value ? getSeller(item.value.sellerId) : null));
 const savedPercent = computed(() => {
   if (!item.value?.originalPrice) return 0;
   return Math.round((1 - item.value.price / item.value.originalPrice) * 100);
@@ -70,21 +73,47 @@ const related = computed(() => {
     .slice(0, 4);
 });
 
+function requireLogin() {
+  if (market.currentUser) return true;
+  toast('请先登录');
+  router.push({ name: 'login', query: { redirect: route.fullPath } });
+  return false;
+}
+
 function contactSeller() {
-  if (!item.value) return;
+  if (!item.value || !requireLogin()) return;
   openChat(item.value.id, '你好，这件还在吗？');
 }
 
 function handleFavorite() {
-  if (!item.value) return;
-  const added = toggleFavorite(item.value.id);
-  toast(added ? '已放进收藏夹' : '已取消收藏');
+  if (!item.value || !requireLogin()) return;
+  const result = toggleFavorite(item.value.id);
+  toast(result === 'added' ? '已放进收藏夹' : '已取消收藏');
 }
 
-function handleStatus() {
+async function handleCart() {
+  if (!item.value || !requireLogin()) return;
+  const result = await addToCart(item.value.id);
+  if (result.status === 'own') toast('这是你自己发布的闲置');
+  else if (result.status === 'exists') toast('这件好物已经在购物车里了');
+  else if (result.status === 'ok') toast('已加入购物车');
+  else toast('这件好物暂时无法加入购物车');
+}
+
+async function handleStatus() {
   if (!item.value) return;
-  toggleListingStatus(item.value.id);
+  await toggleListingStatus(item.value.id);
   toast(item.value.status === 'paused' ? '已下架，可在个人中心重新上架' : '已重新上架');
+}
+
+async function copyContact() {
+  if (!item.value?.contact?.value) return;
+  try {
+    await navigator.clipboard.writeText(item.value.contact.value);
+    toast('联系方式已复制');
+  } catch (error) {
+    toast(`联系方式：${item.value.contact.value}`);
+  }
 }
 </script>
 
@@ -153,23 +182,38 @@ function handleStatus() {
         <dl class="detail-specs">
           <div class="spec"><dt>成色</dt><dd>{{ item.condition }}</dd></div>
           <div class="spec"><dt>分类</dt><dd>{{ categoryName(item.category) }}</dd></div>
-          <div class="spec"><dt>交易地点</dt><dd><Icon name="pin" />{{ item.location }}</dd></div>
+          <div class="spec"><dt>面交方式</dt><dd>买卖双方自行商议</dd></div>
           <div class="spec"><dt>发布时间</dt><dd>{{ timeAgo(item.createdAt) }}</dd></div>
         </dl>
 
         <div class="seller-card">
-          <span class="seller-avatar">{{ item.seller.initial }}</span>
+          <RouterLink :to="`/seller/${item.sellerId}`" class="seller-avatar">{{ item.seller.initial }}</RouterLink>
           <div class="seller-meta">
             <div class="seller-name">
-              {{ item.seller.name }}
+              <RouterLink :to="`/seller/${item.sellerId}`">{{ item.seller.name }}</RouterLink>
               <span v-if="item.seller.verified" class="verified-badge"><Icon name="check" /> 校园实名</span>
+              <span v-if="sellerProfile?.publishBanned" class="risk-badge">交易风险 · 已停止发布</span>
             </div>
-            <div class="seller-sub">{{ market.school.name }} · {{ item.seller.dept }} · 成交 {{ item.seller.deals }} 件</div>
+            <div class="seller-sub">
+              {{ market.school.name }} · {{ item.seller.dept }} · 成交 {{ sellerProfile?.deals ?? item.seller.deals }} 件
+            </div>
           </div>
-          <div class="seller-rating">
-            <b><Icon name="star" />{{ Number(item.seller.rating).toFixed(1) }}</b>
-            卖家评分
+          <RouterLink class="seller-rating" :to="`/seller/${item.sellerId}`">
+            <b><Icon name="star" />{{ Number(sellerProfile?.rating ?? item.seller.rating).toFixed(1) }}</b>
+            查看主页
+          </RouterLink>
+        </div>
+
+        <div v-if="item.contact?.value" class="contact-card">
+          <div class="contact-main">
+            <span class="contact-icon"><Icon :name="item.contact.type === 'qq' ? 'user' : 'chat'" /></span>
+            <div>
+              <span class="contact-label">卖家{{ item.contact.type === 'qq' ? 'QQ' : '微信' }}</span>
+              <b>{{ item.contact.value }}</b>
+              <p>添加时请备注「拾光集」，交易地点由双方自行商议。</p>
+            </div>
           </div>
+          <button class="btn btn-outline btn-sm" type="button" @click="copyContact">复制</button>
         </div>
 
         <div v-if="!available" class="search-note">
@@ -188,6 +232,9 @@ function handleStatus() {
         <div v-else class="detail-actions">
           <button class="btn btn-primary" type="button" :disabled="!available" @click="contactSeller">
             <Icon name="chat" /> {{ available ? '我想要 · 联系卖家' : '该好物已下架' }}
+          </button>
+          <button class="cart-lg" type="button" aria-label="加入购物车" :disabled="!available" @click="handleCart">
+            <Icon name="cart" />
           </button>
           <button
             class="fav-btn fav-lg"

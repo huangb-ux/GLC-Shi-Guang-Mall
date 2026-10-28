@@ -19,10 +19,8 @@ import {
   guessArt
 } from '../lib/format';
 import {
-  AREAS,
   CATEGORIES,
-  CONDITIONS,
-  SCHOOL
+  CONDITIONS
 } from '../data/site';
 
 const route = useRoute();
@@ -40,8 +38,8 @@ const form = reactive({
   originalPrice: '',
   condition: '9成新',
   tags: '',
-  area: '图书馆',
-  place: '',
+  contactType: 'wechat',
+  contactValue: '',
   description: ''
 });
 
@@ -73,8 +71,8 @@ function loadForm() {
       originalPrice: '',
       condition: '9成新',
       tags: '',
-      area: '图书馆',
-      place: '',
+      contactType: market.currentUser?.contact?.type || 'wechat',
+      contactValue: market.currentUser?.contact?.value || '',
       description: ''
     });
     images.value = [];
@@ -95,8 +93,8 @@ function loadForm() {
     originalPrice: listing.originalPrice ? String(listing.originalPrice) : '',
     condition: listing.condition,
     tags: (listing.tags || []).join('、'),
-    area: listing.area || '图书馆',
-    place: listing.place || '',
+    contactType: listing.contact?.type || 'wechat',
+    contactValue: listing.contact?.value || '',
     description: listing.description
   });
   images.value = (listing.images || []).slice(0, 3);
@@ -147,6 +145,15 @@ function validate() {
     errors.originalPrice = '原价不应低于售价。';
   }
 
+  const contact = form.contactValue.trim();
+  if (!contact) {
+    errors.contactValue = form.contactType === 'qq' ? '请填写卖家的 QQ 号' : '请填写卖家的微信号';
+  } else if (form.contactType === 'qq' && !/^\d{5,12}$/.test(contact)) {
+    errors.contactValue = 'QQ 号通常是 5–12 位数字';
+  } else if (form.contactType === 'wechat' && !/^[A-Za-z0-9_-]{5,20}$/.test(contact)) {
+    errors.contactValue = '微信号通常是 5–20 位字母、数字、下划线或横线';
+  }
+
   if (Object.keys(errors).length) {
     requestAnimationFrame(() => {
       const first = document.querySelector('.field.has-error');
@@ -158,14 +165,15 @@ function validate() {
   return true;
 }
 
-function submit() {
+async function submit() {
   if (!validate()) return;
 
   const category = categoryOf(form.category);
-  const place = form.place.trim();
-  const area = form.area;
-  const location = `${SCHOOL.name} · ${area}${place ? ' · ' + place : ''}`;
   const tags = form.tags.split(/[,，、\s]+/).filter(Boolean).slice(0, 4);
+  const contact = {
+    type: form.contactType,
+    value: form.contactValue.trim()
+  };
 
   const payload = {
     title: form.title.trim(),
@@ -174,9 +182,7 @@ function submit() {
     originalPrice: Number(form.originalPrice) || 0,
     condition: form.condition,
     tags,
-    area,
-    place,
-    location,
+    contact,
     description: form.description.trim(),
     images: images.value.slice(0, 3),
     art: previewArt.value,
@@ -184,31 +190,43 @@ function submit() {
   };
 
   const editingId = route.query.id ? String(route.query.id) : '';
-  let target;
 
-  if (editingId) {
-    target = updateListing(editingId, payload);
-    if (!target) {
-      toast('没有找到要编辑的闲置');
-      return;
+  try {
+    let target;
+    if (editingId) {
+      target = await updateListing(editingId, payload);
+      toast('修改已保存');
+    } else {
+      target = await addListing(payload);
+      toast('上架成功，祝早日遇到新主人 🎉');
     }
-    toast('修改已保存');
-  } else {
-    target = addListing(payload);
-    toast('上架成功，祝早日遇到新主人 🎉');
+    router.push(`/item/${target.id}`);
+  } catch (error) {
+    toast(error.message || '保存失败，请稍后再试');
   }
-
-  router.push(`/item/${target.id}`);
 }
 </script>
 
 <template>
   <NotFoundView v-if="missing" />
+  <div v-else-if="market.currentUser?.publishBanned" class="page page-fade publish-page wrap">
+    <div class="publish-blocked">
+      <div class="empty-icon"><Icon name="shield" /></div>
+      <p class="eyebrow">PUBLISH PAUSED</p>
+      <h1>你的发布权限已被暂停</h1>
+      <p>{{ market.currentUser.banReason || '因收到多起买家举报，平台已暂停你的发布权限。' }}</p>
+      <p class="publish-blocked-note">你仍然可以浏览、购买和查看历史订单。如有异议，请联系管理员复核。</p>
+      <div class="publish-blocked-actions">
+        <RouterLink class="btn btn-primary" :to="`/seller/${market.currentUser.id}`">查看我的卖家主页</RouterLink>
+        <RouterLink class="btn btn-outline" to="/">回到集市</RouterLink>
+      </div>
+    </div>
+  </div>
   <div v-else class="page page-fade publish-page wrap">
     <div class="publish-head">
       <p class="eyebrow">{{ isEditing ? 'EDIT LISTING' : 'SELL SOMETHING' }}</p>
       <h1>{{ isEditing ? '编辑这件闲置' : '让闲置，继续发光。' }}</h1>
-      <p>{{ isEditing ? '修改后会立即更新到集市。' : '认真写清楚成色与交易地点，会更快遇到下一位主人。' }}</p>
+      <p>{{ isEditing ? '修改后会立即更新到集市。' : '认真写清楚成色与联系方式，会更快遇到下一位主人。' }}</p>
     </div>
 
     <div class="publish-grid">
@@ -261,17 +279,26 @@ function submit() {
 
         <section class="form-section">
           <h2 class="form-section-title">交易信息 <span>02</span></h2>
-          <div class="form-row">
-            <div class="field">
-              <label class="field-label" for="f-area">校内地点<span class="req">*</span></label>
-              <select id="f-area" v-model="form.area" class="select">
-                <option v-for="area in AREAS" :key="area" :value="area">{{ area }}</option>
-              </select>
+
+          <div class="field" :class="{ 'has-error': errors.contactValue }">
+            <label class="field-label" for="f-contact">卖家联系方式<span class="req">*</span></label>
+            <div class="contact-choice">
+              <label class="choice">
+                <input v-model="form.contactType" type="radio" name="contactType" value="wechat"> 微信
+              </label>
+              <label class="choice">
+                <input v-model="form.contactType" type="radio" name="contactType" value="qq"> QQ
+              </label>
+              <input
+                id="f-contact"
+                v-model="form.contactValue"
+                class="input contact-input"
+                :placeholder="form.contactType === 'wechat' ? '填写微信号，方便买家联系' : '填写 QQ 号，方便买家联系'"
+                maxlength="30"
+              >
             </div>
-            <div class="field">
-              <label class="field-label" for="f-place">具体位置<span class="opt">选填</span></label>
-              <input id="f-place" v-model="form.place" class="input" maxlength="40" placeholder="图书馆南门 / 东区 3 栋楼下">
-            </div>
+            <p class="field-hint"><Icon name="info" /> 联系方式会显示在商品详情和卖家主页，请填写真实可用的账号。</p>
+            <p class="field-error">{{ errors.contactValue }}</p>
           </div>
 
           <div class="field" :class="{ 'has-error': errors.description }">
@@ -283,7 +310,7 @@ function submit() {
               maxlength="600"
               placeholder="什么时候买的、使用情况如何、为什么出、有没有配件或瑕疵……写得越清楚，越容易被信任。"
             ></textarea>
-            <p class="field-hint"><Icon name="info" /> 建议写清楚购入时间、使用频率和瑕疵，减少来回沟通。</p>
+            <p class="field-hint"><Icon name="info" /> 交易时间和地点由买卖双方在私信里自行商量，不需要在这里填写。</p>
             <p class="field-error">{{ errors.description }}</p>
           </div>
         </section>
@@ -324,7 +351,7 @@ function submit() {
             <span class="condition-badge">{{ form.condition }}</span>
           </div>
           <div class="lp-body">
-            <p class="lp-cat">{{ categoryName(form.category) }} · {{ form.area }}</p>
+            <p class="lp-cat">{{ categoryName(form.category) }} · 校内面交</p>
             <p class="lp-title">{{ form.title || '给你的闲置写个标题' }}</p>
             <div class="lp-price">
               <em>¥</em>{{ Number(form.price) ? fmtPrice(form.price) : '—' }}

@@ -1,8 +1,9 @@
 <script setup>
 import { computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import Artwork from './Artwork.vue';
 import Icon from './Icon.vue';
-import { market, toggleFavorite } from '../stores/market';
+import { addToCart, isMine, market, toggleFavorite } from '../stores/market';
 import { toast } from '../stores/ui';
 import { fmtPrice, timeAgo } from '../lib/format';
 
@@ -10,11 +11,36 @@ const props = defineProps({
   item: { type: Object, required: true }
 });
 
+const route = useRoute();
+const router = useRouter();
 const isFavorite = computed(() => market.favorites.has(props.item.id));
 
-function handleFavorite() {
-  const added = toggleFavorite(props.item.id);
-  toast(added ? '已放进收藏夹' : '已取消收藏');
+async function handleFavorite() {
+  const result = toggleFavorite(props.item.id);
+  if (result === 'auth') {
+    toast('请先登录后再收藏');
+    router.push({ name: 'login', query: { redirect: route.fullPath } });
+    return;
+  }
+  toast(result === 'added' ? '已放进收藏夹' : '已取消收藏');
+}
+
+async function handleCart(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  const result = await addToCart(props.item.id);
+  if (result.status === 'auth') {
+    toast('请先登录后再加入购物车');
+    router.push({ name: 'login', query: { redirect: route.fullPath } });
+  } else if (result.status === 'own') {
+    toast('这是你自己发布的闲置');
+  } else if (result.status === 'exists') {
+    toast('这件好物已经在购物车里了');
+  } else if (result.status === 'ok') {
+    toast('已加入购物车');
+  } else {
+    toast('这件好物暂时无法加入购物车');
+  }
 }
 </script>
 
@@ -35,7 +61,16 @@ function handleFavorite() {
       >
         <Icon name="heart" />
       </button>
-      <span class="card-campus">{{ item.area || market.school.name }}</span>
+      <button
+        v-if="!isMine(item)"
+        class="card-cart"
+        type="button"
+        aria-label="加入购物车"
+        @click="handleCart"
+      >
+        <Icon name="cart" />
+      </button>
+      <span class="card-campus">校内面交</span>
     </div>
     <div class="card-body">
       <RouterLink class="card-title" :to="`/item/${item.id}`">{{ item.title }}</RouterLink>
