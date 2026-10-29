@@ -344,6 +344,48 @@
       <ellipse cx="200" cy="266" rx="58" ry="6" fill="${p.deep}" opacity=".12"/>`;
     },
 
+    /* 桌面风扇 */
+    fan(p) {
+      return `
+      <ellipse cx="200" cy="260" rx="62" ry="9" fill="${p.deep}" opacity=".12"/>
+      <rect x="196" y="196" width="8" height="56" rx="4" fill="${p.deep}"/>
+      <path d="M170 252h60" stroke="${p.deep}" stroke-width="8" stroke-linecap="round"/>
+      <circle cx="200" cy="148" r="78" fill="${p.light}" stroke="${p.deep}" stroke-width="5"/>
+      <circle cx="200" cy="148" r="64" fill="${p.bg}" stroke="${p.mid}" stroke-width="3"/>
+      <g fill="${p.accent}" stroke="${p.deep}" stroke-width="3">
+        <path d="M200 148 C178 122 190 90 216 86 C238 82 246 106 230 126 C220 138 210 144 200 148Z"/>
+        <path d="M200 148 C178 122 190 90 216 86 C238 82 246 106 230 126 C220 138 210 144 200 148Z" transform="rotate(120 200 148)"/>
+        <path d="M200 148 C178 122 190 90 216 86 C238 82 246 106 230 126 C220 138 210 144 200 148Z" transform="rotate(240 200 148)"/>
+      </g>
+      <circle cx="200" cy="148" r="15" fill="${p.mid}" stroke="${p.deep}" stroke-width="3"/>
+      <circle cx="200" cy="148" r="5" fill="${p.light}" opacity=".8"/>
+      <path d="M140 86c-8-12 8-18 0-30M258 86c8-12-8-18 0-30" fill="none" stroke="${p.accent}" stroke-width="3" stroke-linecap="round" opacity=".55"/>`;
+    },
+
+    /* 帆布托特包 */
+    bag(p) {
+      return `
+      <path d="M136 116h128l12 130H124Z" fill="${p.mid}" stroke="${p.deep}" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M168 118V96c0-28 64-28 64 0v22" fill="none" stroke="${p.deep}" stroke-width="7" stroke-linecap="round"/>
+      <path d="M140 150h120" stroke="${p.light}" stroke-width="3" opacity=".35"/>
+      <rect x="184" y="170" width="32" height="22" rx="5" fill="${p.accent}" stroke="${p.deep}" stroke-width="3"/>
+      <path d="M192 181h16" stroke="${p.light}" stroke-width="2" opacity=".6"/>
+      <path d="M148 214h104M156 228h88" stroke="${p.light}" stroke-width="2" stroke-dasharray="4 6" opacity=".25"/>`;
+    },
+
+    /* 小型加湿器 */
+    humidifier(p) {
+      return `
+      <ellipse cx="200" cy="258" rx="58" ry="9" fill="${p.deep}" opacity=".12"/>
+      <rect x="148" y="112" width="104" height="128" rx="22" fill="${p.light}" stroke="${p.deep}" stroke-width="5"/>
+      <path d="M148 144h104" stroke="${p.deep}" stroke-width="4"/>
+      <ellipse cx="200" cy="112" rx="52" ry="12" fill="${p.mid}" stroke="${p.deep}" stroke-width="4"/>
+      <circle cx="200" cy="188" r="22" fill="${p.accent}" stroke="${p.deep}" stroke-width="4"/>
+      <path d="M192 188h16M200 180v16" stroke="${p.light}" stroke-width="3" stroke-linecap="round" opacity=".65"/>
+      <path d="M174 98c-10-14 10-20 0-34M226 98c10-14 0-20 0-34" fill="none" stroke="${p.accent}" stroke-width="3" stroke-linecap="round" opacity=".55"/>
+      <path d="M168 226h64" stroke="${p.light}" stroke-width="3" stroke-linecap="round" opacity=".35"/>`;
+    },
+
     /* 收纳盒 */
     box(p) {
       return `

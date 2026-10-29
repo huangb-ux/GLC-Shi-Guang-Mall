@@ -28,6 +28,7 @@ const filteredPosts = computed(() => {
 
 const isLoggedIn = computed(() => Boolean(market.currentUser));
 const openTeams = computed(() => market.gamePosts.reduce((total, post) => total + (post.players?.length || 0), 0));
+const testAccountCount = computed(() => market.accounts.filter(account => account.isTest).length);
 
 function openComposer() {
   if (!isLoggedIn.value) {
@@ -108,7 +109,7 @@ function linkHost(link) {
     <div class="games-stats">
       <div><b>{{ market.gamePosts.length }}</b><span>条组队邀请</span></div>
       <div><b>{{ openTeams }}</b><span>人已经上车</span></div>
-      <div><b>5</b><span>个测试账号可登录</span></div>
+      <div><b>{{ testAccountCount }}</b><span>个测试账号可登录</span></div>
       <p><Icon name="info" /> 游戏链接会跳转到官方站点或你分享的页面，请注意财产安全。</p>
     </div>
 

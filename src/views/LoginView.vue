@@ -117,7 +117,7 @@ async function submitRegister() {
           <p class="auth-switch">还没有账号？<button type="button" @click="switchMode('register')">立即注册</button></p>
           <div class="auth-admin-hint">
             <span class="hint-line">演示管理员：<b>admin</b> / <b>public</b></span>
-            <span class="hint-line">测试账号：<b>admin1–admin5</b> / <b>public1–public5</b></span>
+            <span class="hint-line">测试账号：<b>admin1–admin10</b> / <b>public1–public10</b></span>
           </div>
         </form>
 
